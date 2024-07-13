@@ -70,12 +70,27 @@ async function populateCollection(
     const randomLatitude = (Math.random() * (maxLatitude - minLatitude) + minLatitude).toFixed(decimals);
     const randomLongitude = (Math.random() * (maxLongitude - minLongitude) + minLongitude).toFixed(decimals);
     const randomRadius = (Math.random() * (maxRadius - minRadius) + minRadius).toFixed(radiusDecimals);
+    
+    const box = [
+      [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
+      [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01]
+    ];
+    
+    const polygon = [
+      [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
+      [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) + 0.01],
+      [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01],
+      [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) - 0.01],
+      [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01]
+    ];
+  
     const document = {
-      coordinates: [randomLatitude, randomLongitude],
-      radius: randomRadius,
+      coordinates: [parseFloat(randomLatitude), parseFloat(randomLongitude)],
+      radius: parseFloat(randomRadius),
+      box: box,
+      polygon: polygon
     };
     await collection.insertOne(document);
   }
-  return collection;
 }
 startQuery();
