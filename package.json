@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "6.6"
+    "mongodb": "6.6",
+    "winston": "^3.13.1"
   },
-  "description": ""
+  "description": "",
+  "type": "module"
 }
