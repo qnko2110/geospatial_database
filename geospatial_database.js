@@ -1,5 +1,8 @@
 import { MongoClient } from "mongodb";
 import winston from "winston";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const logger = winston.createLogger({
   level: "info",
@@ -15,8 +18,8 @@ const logger = winston.createLogger({
   ],
 });
 
-const url = "mongodb://127.0.0.1:27017";
-const dbName = "geospatial_database";
+const url = process.env.MONGODB_URL;
+const dbName = process.env.DB_NAME;
 const collectionName_one = "circle1";
 const collectionName_two = "circle2";
 const collectionName_three = "circle3";
