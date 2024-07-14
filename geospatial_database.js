@@ -23,6 +23,12 @@ const dbName = process.env.DB_NAME;
 const collectionName_one = "circle1";
 const collectionName_two = "circle2";
 const collectionName_three = "circle3";
+const collectionName_four = "box1";
+const collectionName_five = "box2";
+const collectionName_six = "box3";
+const collectionName_seven = "polygon1";
+const collectionName_eight = "polygon2";
+const collectionName_nine = "polygon3";
 const options = {
   serverSelectionTimeoutMS: 3000,
   connectTimeoutMS: 3000,
@@ -46,22 +52,58 @@ async function startQuery() {
   }
   console.time("Find time: ");
 
-  const result1 = await populateCollection(
+  const result1 = await populateCollectionCircle(
     client,
     dbName,
     collectionName_one,
     COLLECTION_ONE_SIZE
   );
-  const result2 = await populateCollection(
+  const result2 = await populateCollectionCircle(
     client,
     dbName,
     collectionName_two,
     COLLECTION_TWO_SIZE
   );
-  const result3 = await populateCollection(
+  const result3 = await populateCollectionCircle(
     client,
     dbName,
     collectionName_three,
+    COLLECTION_THREE_SIZE
+  );
+  const result4 = await populateCollectionBox(
+    client,
+    dbName,
+    collectionName_four,
+    COLLECTION_ONE_SIZE
+  );
+  const result5 = await populateCollectionBox(
+    client,
+    dbName,
+    collectionName_five,
+    COLLECTION_TWO_SIZE
+  );
+  const result6 = await populateCollectionBox(
+    client,
+    dbName,
+    collectionName_six,
+    COLLECTION_THREE_SIZE
+  );
+  const result7 = await populateCollectionPolygon(
+    client,
+    dbName,
+    collectionName_seven,
+    COLLECTION_ONE_SIZE
+  );
+  const result8 = await populateCollectionPolygon(
+    client,
+    dbName,
+    collectionName_eight,
+    COLLECTION_TWO_SIZE
+  );
+  const result9 = await populateCollectionPolygon(
+    client,
+    dbName,
+    collectionName_nine,
     COLLECTION_THREE_SIZE
   );
 
@@ -74,8 +116,35 @@ async function startQuery() {
   logger.info(
     `Response time for ${collectionName_three}: ${result3.toFixed(3)} ms`
   );
+  logger.info(
+    `Response time for ${collectionName_four}: ${result4.toFixed(3)} ms`
+  );
+  logger.info(
+    `Response time for ${collectionName_five}: ${result5.toFixed(3)} ms`
+  );
+  logger.info(
+    `Response time for ${collectionName_six}: ${result6.toFixed(3)} ms`
+  );
+  logger.info(
+    `Response time for ${collectionName_seven}: ${result7.toFixed(3)} ms`
+  );
+  logger.info(
+    `Response time for ${collectionName_eight}: ${result8.toFixed(3)} ms`
+  );
+  logger.info(
+    `Response time for ${collectionName_nine}: ${result9.toFixed(3)} ms`
+  );
 
-  const totalResponseTime = result1 + result2 + result3;
+  const totalResponseTime =
+    result1 +
+    result2 +
+    result3 +
+    result4 +
+    result5 +
+    result6 +
+    result7 +
+    result8 +
+    result9;
   const averageResponseTime = totalResponseTime / 3;
 
   logger.info(
@@ -88,7 +157,7 @@ async function startQuery() {
   await client.close();
 }
 
-async function populateCollection(
+async function populateCollectionCircle(
   client,
   dbName,
   collectionName,
@@ -123,12 +192,119 @@ async function populateCollection(
         minRadius
       ).toFixed(radiusDecimals);
 
-      const box = [
+      const document = {
+        coordinates: [parseFloat(randomLatitude), parseFloat(randomLongitude)],
+        radius: parseFloat(randomRadius),
+      };
+
+      batch.push(document);
+    }
+
+    const startTime = process.hrtime();
+    await collection.insertMany(batch);
+    const endTime = process.hrtime(startTime);
+
+    const responseTime = endTime[0] * 1000 + endTime[1] / 1e6;
+    totalResponseTime += responseTime;
+
+    logger.info(
+      `Inserted batch ${
+        i / batchSize + 1
+      }, response time: ${responseTime.toFixed(3)} ms`
+    );
+  }
+
+  const averageResponseTime = totalResponseTime / (collectionSize / batchSize);
+  return averageResponseTime;
+}
+
+async function populateCollectionBox(
+  client,
+  dbName,
+  collectionName,
+  collectionSize
+) {
+  const collection = client.db(dbName).collection(collectionName);
+  let totalResponseTime = 0;
+  const batchSize = 1000; // Adjust batch size as needed
+
+  for (let i = 0; i < collectionSize; i += batchSize) {
+    const batch = [];
+    for (let j = 0; j < batchSize && i + j < collectionSize; j++) {
+      const minLatitude = -90;
+      const maxLatitude = 90;
+      const minLongitude = -180;
+      const maxLongitude = 180;
+      const decimals = 7;
+
+      const randomLatitude = (
+        Math.random() * (maxLatitude - minLatitude) +
+        minLatitude
+      ).toFixed(decimals);
+      const randomLongitude = (
+        Math.random() * (maxLongitude - minLongitude) +
+        minLongitude
+      ).toFixed(decimals);
+
+      const coordinates = [
         [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
         [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01],
       ];
 
-      const polygon = [
+      const document = {
+        coordinates: coordinates,
+      };
+
+      batch.push(document);
+    }
+
+    const startTime = process.hrtime();
+    await collection.insertMany(batch);
+    const endTime = process.hrtime(startTime);
+
+    const responseTime = endTime[0] * 1000 + endTime[1] / 1e6;
+    totalResponseTime += responseTime;
+
+    logger.info(
+      `Inserted batch ${
+        i / batchSize + 1
+      }, response time: ${responseTime.toFixed(3)} ms`
+    );
+  }
+
+  const averageResponseTime = totalResponseTime / (collectionSize / batchSize);
+  return averageResponseTime;
+}
+
+async function populateCollectionPolygon(
+  client,
+  dbName,
+  collectionName,
+  collectionSize
+) {
+  const collection = client.db(dbName).collection(collectionName);
+  let totalResponseTime = 0;
+  const batchSize = 1000; // Adjust batch size as needed
+
+  for (let i = 0; i < collectionSize; i += batchSize) {
+    const batch = [];
+    for (let j = 0; j < batchSize && i + j < collectionSize; j++) {
+      const minLatitude = -90;
+      const maxLatitude = 90;
+      const minLongitude = -180;
+      const maxLongitude = 180;
+      const decimals = 7;
+
+      const randomLatitude = (
+        Math.random() * (maxLatitude - minLatitude) +
+        minLatitude
+      ).toFixed(decimals);
+      const randomLongitude = (
+        Math.random() * (maxLongitude - minLongitude) +
+        minLongitude
+      ).toFixed(decimals);
+
+      const coordinates = [
         [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
         [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) + 0.01],
         [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01],
@@ -137,10 +313,7 @@ async function populateCollection(
       ];
 
       const document = {
-        coordinates: [parseFloat(randomLatitude), parseFloat(randomLongitude)],
-        radius: parseFloat(randomRadius),
-        box: box,
-        polygon: polygon,
+        coordinates: coordinates,
       };
 
       batch.push(document);
