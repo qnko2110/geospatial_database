@@ -193,9 +193,14 @@ async function populateCollectionCircle(
       ).toFixed(radiusDecimals);
 
       const document = {
-        coordinates: [parseFloat(randomLatitude), parseFloat(randomLongitude)],
-        radius: parseFloat(randomRadius),
-        type: "Circle",
+        location: {
+          coordinates: [
+            parseFloat(randomLatitude),
+            parseFloat(randomLongitude),
+          ],
+          radius: parseFloat(randomRadius),
+          type: "Circle",
+        },
       };
 
       batch.push(document);
@@ -253,8 +258,10 @@ async function populateCollectionBox(
       ];
 
       const document = {
-        coordinates: coordinates,
-        type: "box",
+        location: {
+          coordinates: coordinates,
+          type: "box",
+        },
       };
 
       batch.push(document);
@@ -315,8 +322,10 @@ async function populateCollectionPolygon(
       ];
 
       const document = {
-        coordinates: coordinates,
-        type: "polygon",
+        location: {
+          coordinates: coordinates,
+          type: "polygon",
+        },
       };
 
       batch.push(document);
