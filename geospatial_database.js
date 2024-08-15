@@ -255,6 +255,8 @@ async function populateCollectionBox(
       const coordinates = [
         [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
         [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01],
+        [parseFloat(randomLatitude) - 0.01, parseFloat(randomLongitude) - 0.01],
+        [parseFloat(randomLatitude) + 0.01, parseFloat(randomLongitude) + 0.01],
       ];
 
       const document = {
