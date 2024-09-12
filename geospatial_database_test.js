@@ -49,23 +49,12 @@ async function startQuery() {
   }
   console.time("Find time: ");
 
-  const collection1 = client.db(dbName).collection(collectionName_one);
-  await collection1.createIndex({ location: "2dsphere" });
+ 
   const collection4 = client.db(dbName).collection(collectionName_four);
   await collection4.createIndex({ location: "2dsphere" });
-  const collection7 = client.db(dbName).collection(collectionName_seven);
-  await collection7.createIndex({ location: "2dsphere" });
+  
 
-  const query1 = collection1
-    .find({
-      location: {
-        $geoWithin: {
-          $centerSphere: [[coordinates[0], coordinates[1]], radius],
-        },
-      },
-    })
-    .toArray();
-  console.log(query1);
+ 
 
   const query2 = collection4
     .find({
@@ -83,22 +72,7 @@ async function startQuery() {
     .toArray();
   console.log(query2);
 
-  const query3 = collection7
-    .find({
-      location: {
-        $geoWithin: {
-          $polygon: [
-            [coordinates[0], coordinates[1]],
-            [coordinates[0], coordinates[1]],
-            [coordinates[0], coordinates[1]],
-            [coordinates[0], coordinates[1]],
-            [coordinates[0], coordinates[1]],
-          ],
-        },
-      },
-    })
-    .toArray();
-  console.log(query3);
+  
 }
 
 await startQuery();

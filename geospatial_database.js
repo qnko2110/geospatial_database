@@ -145,7 +145,7 @@ async function startQuery() {
     result7 +
     result8 +
     result9;
-  const averageResponseTime = totalResponseTime / 3;
+  const averageResponseTime = totalResponseTime / 9;
 
   logger.info(
     `Average response time for all collections: ${averageResponseTime.toFixed(
